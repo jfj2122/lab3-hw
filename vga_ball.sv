@@ -45,7 +45,7 @@ module vga_ball(input logic        clk,
 	 7'h3 : ball_c[15:8] <= writedata;
 	 7'h4 : ball_c[7:0]  <= writedata;
 	 7'h5 : ball_r[15:8] <= writedata;
-	 7'h6 : addr_r[7:0]  <= writedata;
+	 7'h6 : ball_r[7:0]  <= writedata;
        endcase
 
    always_comb begin
