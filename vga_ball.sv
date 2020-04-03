@@ -23,7 +23,8 @@ module vga_ball(input logic        clk,
    logic [9:0]     vcount;
    logic [15:0]    ball_c, ball_r;
 
-   logic [7:0] 	   background_r, background_g, background_b; // addr_c, addr_r;
+   logic [7:0] 	   background_r, background_g, background_b addr_c1,
+		   addr_c2, addr_r1, addr_r2;
 	
    vga_counters counters(.clk50(clk), .*);
 
@@ -36,18 +37,25 @@ module vga_ball(input logic        clk,
 	ball_c[7:0]  <= 8'h0;
 	ball_r[15:8] <= 8'h0;
 	ball_r[7:0]  <= 8'h0;
-     end else if (chipselect && write)
-       case (address) //7 bytes
-	 7'h0 : background_r <= writedata;
-	 7'h1 : background_g <= writedata;
-	 7'h2 : background_b <= writedata;
-	 // added to read row and column corner for ball
-	 7'h3 : ball_c[15:8] <= writedata;
-	 7'h4 : ball_c[7:0]  <= writedata;
-	 7'h5 : ball_r[15:8] <= writedata;
-	 7'h6 : ball_r[7:0]  <= writedata;
-       endcase
+     end else if (chipselect && write) begin
+	case (address) //7 bytes
+	  7'h0 : background_r <= writedata;
+	  7'h1 : background_g <= writedata;
+	  7'h2 : background_b <= writedata;
+	  // added to read row and column corner for ball
+	  7'h3 : addr_c1 <= writedata;
+	  7'h4 : addr_c2 <= writedata;
+	  7'h5 : addr_r1 <= writedata;
+	  7'h6 : addr_r2 <= writedata;
+	endcase // case (address)
+	ball_c[15:8] <= addr_c1;
+	ball_c[7:0]  <= addr_c2;
+	ball_r[15:8] <= addr_r1;
+	ball_r[7:0]  <= addr_r2;
+     end // if (chipselect && write)
+   
 
+   
    always_comb begin
       {VGA_R, VGA_G, VGA_B} = {8'h0, 8'h0, 8'h0};
       if (VGA_BLANK_n )
