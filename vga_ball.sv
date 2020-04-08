@@ -59,10 +59,16 @@ module vga_ball(input logic        clk,
    always_comb begin
       {VGA_R, VGA_G, VGA_B} = {8'h0, 8'h0, 8'h0};
       if (VGA_BLANK_n )
-	if (hcount >= ball_c &&
+	if ( (hcount-ball_c)*(hcount-ball_c) + (vcount-ball_r)*(vcount-ball_r) <= 10'd625)
+	    /*(hcount >= ball_c &&
 	    hcount <= ball_c + 5'b11111 &&
 	    vcount >= ball_r &&
-	    vcount <= ball_r + 4'b1111)
+	    vcount <= ball_r + 4'b1111) */
+	  {VGA_R, VGA_G, VGA_B} = {8'hff, 8'hff, 8'hff};
+	else if (hcount == 0 ||
+		 hcount == 640 ||
+		 vcount == 0 ||
+		 vcount == 480)
 	  {VGA_R, VGA_G, VGA_B} = {8'hff, 8'hff, 8'hff};
 	else
 	  {VGA_R, VGA_G, VGA_B} =
