@@ -23,7 +23,7 @@ module vga_ball(input logic        clk,
    logic [9:0]     vcount;
    logic [15:0]    ball_c, ball_r;
 
-   logic [7:0] 	   background_r, background_g, background_b addr_c1,
+   logic [7:0] 	   background_r, background_g, background_b, addr_c1,
 		   addr_c2, addr_r1, addr_r2;
 	
    vga_counters counters(.clk50(clk), .*);
@@ -58,22 +58,19 @@ module vga_ball(input logic        clk,
    
    always_comb begin
       {VGA_R, VGA_G, VGA_B} = {8'h0, 8'h0, 8'h0};
-      if (VGA_BLANK_n )
-	if ( (hcount-ball_c)*(hcount-ball_c) + (vcount-ball_r)*(vcount-ball_r) <= 10'd625)
-	    /*(hcount >= ball_c &&
-	    hcount <= ball_c + 5'b11111 &&
-	    vcount >= ball_r &&
-	    vcount <= ball_r + 4'b1111) */
-	  {VGA_R, VGA_G, VGA_B} = {8'hff, 8'hff, 8'hff};
-	else if (hcount == 0 ||
-		 hcount == 640 ||
-		 vcount == 0 ||
-		 vcount == 480)
-	  {VGA_R, VGA_G, VGA_B} = {8'hff, 8'hff, 8'hff};
-	else
-	  {VGA_R, VGA_G, VGA_B} =
-             {background_r, background_g, background_b};
-   end
+      if (VGA_BLANK_n ) begin
+	 if ( hcount >= ball_c - 5'd25 &&
+	      hcount <= ball_c + 5'd25 &&
+	      vcount >= ball_r - 5'd25 &&
+	      vcount <= ball_r + 5'd25) begin
+	    if ( (hcount-ball_c)*(hcount-ball_c) + (vcount-ball_r)*(vcount-ball_r) <= 10'd625)
+	      {VGA_R, VGA_G, VGA_B} = {8'hff, 8'hff, 8'hff};
+	    else
+	      {VGA_R, VGA_G, VGA_B} = {background_r, background_g, background_b};
+	 end else
+	   {VGA_R, VGA_G, VGA_B} = {background_r, background_g, background_b};
+      end // if (VGA_BLANK_n )
+   end // always_comb
 	       
 endmodule
 
